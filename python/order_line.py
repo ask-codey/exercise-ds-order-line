@@ -1,25 +1,19 @@
 # The coffee shop's order line. Three classes: OrderQueue (the line of
-# orders) and CupStack (the clean mugs) to finish, and CoffeeShop, where
-# only serve_next is left. The comment inside each method says what it
-# should do, with examples. Replace each body with your own code, and write
-# its Big-O in its comment.
-
-
-class OrderNode:
-    """One order in a line, for building the queue as a linked list. You don't
-    have to use it: a front index into a list works too."""
-
-    def __init__(self, order):
-        self.order = order
-        self.next = None
+# orders), which works today but freezes the order screen at rush hour,
+# so make it fast; CupStack (the clean mugs) to finish; and CoffeeShop,
+# where only serve_next is left. The comment inside each method says what
+# it should do, with examples. Replace each body with your own code, and
+# write its Big-O in its comment.
 
 
 class OrderQueue:
-    """The line of orders: first in, first out. Build it so every method is
-    O(1): a linked list with a front and a back, or a list with a front index.
-    Not a list emptied with pop(0), which is O(n), and not collections.deque."""
+    """The line of orders: first in, first out. This is the queue the shop runs
+    today. It works, and it's why the order screen freezes at rush hour (the
+    ticket in README.md). Make enqueue, dequeue and peek fast, keeping their
+    names and what they return: the tests and CoffeeShop call them."""
 
     def __init__(self):
+        self.orders = []
         self.count = 0
 
     def enqueue(self, order):
@@ -30,7 +24,8 @@ class OrderQueue:
 
         Big-O: (write it here)
         """
-        pass  # your code here
+        self.orders.append(order)
+        self.count += 1
 
     def dequeue(self):
         """
@@ -41,7 +36,10 @@ class OrderQueue:
 
         Big-O: (write it here)
         """
-        return None
+        if not self.orders:
+            return None
+        self.count -= 1
+        return self.orders.pop(0)
 
     def peek(self):
         """
@@ -50,7 +48,7 @@ class OrderQueue:
 
         Big-O: (write it here)
         """
-        return None
+        return self.orders[0] if self.orders else None
 
 
 class CupStack:

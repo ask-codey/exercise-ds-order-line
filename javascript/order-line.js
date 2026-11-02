@@ -1,27 +1,18 @@
 // The coffee shop's order line. Three classes: OrderQueue (the line of
-// orders) and CupStack (the clean mugs) to finish, and CoffeeShop, where
-// only serveNext is left. The comment above each method says what it
-// should do, with examples. Replace each body with your own code, and
+// orders), which works today but freezes the order screen at rush hour,
+// so make it fast; CupStack (the clean mugs) to finish; and CoffeeShop,
+// where only serveNext is left. The comment above each method says what
+// it should do, with examples. Replace each body with your own code, and
 // write its Big-O in its comment.
 
 /**
- * One order in a line, for building the queue as a linked list. You don't
- * have to use it: a front index into an array works too.
- */
-export class OrderNode {
-  constructor(order) {
-    this.order = order;
-    this.next = null;
-  }
-}
-
-/**
- * The line of orders: first in, first out. Build it so every method is
- * O(1): a linked list with a front and a back, or an array with a front
- * index. Not an array emptied with shift(), which is O(n). (JavaScript has no
- * built-in queue.)
+ * The line of orders: first in, first out. This is the queue the shop runs
+ * today. It works, and it's why the order screen freezes at rush hour (the
+ * ticket in README.md). Make enqueue, dequeue and peek fast, keeping their
+ * names and what they return: the tests and CoffeeShop call them.
  */
 export class OrderQueue {
+  #orders = [];
   count = 0;
 
   /*
@@ -32,7 +23,8 @@ export class OrderQueue {
    * Big-O: (write it here)
    */
   enqueue(order) {
-    // Your code here.
+    this.#orders.push(order);
+    this.count++;
   }
 
   /*
@@ -44,7 +36,11 @@ export class OrderQueue {
    * Big-O: (write it here)
    */
   dequeue() {
-    return null;
+    if (this.#orders.length === 0) {
+      return null;
+    }
+    this.count--;
+    return this.#orders.shift();
   }
 
   /*
@@ -54,7 +50,7 @@ export class OrderQueue {
    * Big-O: (write it here)
    */
   peek() {
-    return null;
+    return this.#orders.length === 0 ? null : this.#orders[0];
   }
 }
 

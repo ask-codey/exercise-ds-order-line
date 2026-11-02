@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using OrderLine;
 
 namespace OrderLine.Tests;
@@ -100,21 +101,28 @@ public class OrderLineTests
     }
 
     [TestMethod]
-    public void RushHour()
+    public void TheRushHourStaysFast()
     {
         CoffeeShop shop = new CoffeeShop();
-        for (int i = 0; i < 10000; i++)
+        Stopwatch watch = Stopwatch.StartNew();
+        for (int i = 0; i < 400000; i++)
         {
             shop.WashMug("mug " + i);
             shop.PlaceOrder("order " + i);
         }
-        Assert.AreEqual("order 0 in the mug 9999", shop.ServeNext(), "Not yet: the first order placed gets the last mug washed.");
+        Assert.AreEqual("order 0 in the mug 399999", shop.ServeNext(), "Not yet: the first order placed gets the last mug washed.");
         string? last = null;
-        for (int i = 1; i < 10000; i++)
+        for (int i = 1; i < 400000; i++)
         {
             last = shop.ServeNext();
+            if (i % 10000 == 0 && watch.Elapsed.TotalSeconds > 2)
+            {
+                break;
+            }
         }
-        Assert.AreEqual("order 9999 in the mug 0", last, "Not yet: the last order placed gets the first mug washed.");
+        watch.Stop();
+        Assert.IsTrue(watch.Elapsed.TotalSeconds < 2, "Not yet: the rush of 400,000 orders ran past 2 seconds: it was stopped at " + watch.Elapsed.TotalSeconds.ToString("0.0") + " seconds, with " + shop.OrdersWaiting + " orders still waiting. When each order joins and leaves the line in one step, the whole rush takes well under one second.");
+        Assert.AreEqual("order 399999 in the mug 0", last, "Not yet: the last order placed gets the first mug washed.");
         Assert.AreEqual(0, shop.OrdersWaiting, "Not yet: every order was served.");
         Assert.AreEqual(0, shop.MugsLeft, "Not yet: every mug was used.");
     }

@@ -1,19 +1,12 @@
-// The line of orders: first in, first out. Build it so every method is
-// O(1): a linked list with a front and a back, or an array with a front
-// index. Not an ArrayList emptied with remove(0), which is O(n), and not
-// Java's own ArrayDeque or LinkedList.
+import java.util.ArrayList;
+import java.util.List;
+
+// The line of orders: first in, first out. This is the queue the shop runs
+// today. It works, and it's why the order screen freezes at rush hour (the
+// ticket in README.md). Make enqueue, dequeue and peek fast, keeping their
+// names and what they return: the tests and CoffeeShop call them.
 public class OrderQueue {
-    // One order in a line, for building the queue as a linked list. You
-    // don't have to use it: a front index into an array works too.
-    static class OrderNode {
-        String order;
-        OrderNode next;
-
-        OrderNode(String order) {
-            this.order = order;
-        }
-    }
-
+    private final List<String> orders = new ArrayList<>();
     private int count;
 
     // How many orders are waiting.
@@ -29,7 +22,8 @@ public class OrderQueue {
      * Big-O: (write it here)
      */
     public void enqueue(String order) {
-        // Your code here.
+        orders.add(order);
+        count++;
     }
 
     /*
@@ -41,7 +35,11 @@ public class OrderQueue {
      * Big-O: (write it here)
      */
     public String dequeue() {
-        return null;
+        if (orders.isEmpty()) {
+            return null;
+        }
+        count--;
+        return orders.remove(0);
     }
 
     /*
@@ -51,6 +49,6 @@ public class OrderQueue {
      * Big-O: (write it here)
      */
     public String peek() {
-        return null;
+        return orders.isEmpty() ? null : orders.get(0);
     }
 }

@@ -1,5 +1,7 @@
 # The tests for the order line. You don't need to change this file.
 # Each message says what was expected, so a failing test tells you what to look at.
+import time
+
 from order_line import CoffeeShop, CupStack, OrderQueue
 
 
@@ -80,15 +82,20 @@ def test_with_no_order_the_mugs_stay():
     assert shop.serve_next() == "cold brew in the red mug", "Not yet: the new order gets the mug that was waiting."
 
 
-def test_rush_hour():
+def test_the_rush_hour_stays_fast():
     shop = CoffeeShop()
-    for i in range(10000):
+    started = time.perf_counter()
+    for i in range(400000):
         shop.wash_mug(f"mug {i}")
         shop.place_order(f"order {i}")
-    assert shop.serve_next() == "order 0 in the mug 9999", "Not yet: the first order placed gets the last mug washed."
+    assert shop.serve_next() == "order 0 in the mug 399999", "Not yet: the first order placed gets the last mug washed."
     last = None
-    for i in range(1, 10000):
+    for i in range(1, 400000):
         last = shop.serve_next()
-    assert last == "order 9999 in the mug 0", "Not yet: the last order placed gets the first mug washed."
+        if i % 10000 == 0 and time.perf_counter() - started > 2:
+            break
+    seconds = time.perf_counter() - started
+    assert seconds < 2, f"Not yet: the rush of 400,000 orders ran past 2 seconds: it was stopped at {seconds:.1f} seconds, with {shop.orders_waiting} orders still waiting. When each order joins and leaves the line in one step, the whole rush takes well under one second."
+    assert last == "order 399999 in the mug 0", "Not yet: the last order placed gets the first mug washed."
     assert shop.orders_waiting == 0, "Not yet: every order was served."
     assert shop.mugs_left == 0, "Not yet: every mug was used."

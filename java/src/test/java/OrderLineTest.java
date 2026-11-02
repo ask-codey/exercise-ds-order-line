@@ -1,5 +1,6 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -91,18 +92,24 @@ class OrderLineTest {
     }
 
     @Test
-    void rushHour() {
+    void theRushHourStaysFast() {
         CoffeeShop shop = new CoffeeShop();
-        for (int i = 0; i < 10000; i++) {
+        long started = System.nanoTime();
+        for (int i = 0; i < 400000; i++) {
             shop.washMug("mug " + i);
             shop.placeOrder("order " + i);
         }
-        assertEquals("order 0 in the mug 9999", shop.serveNext(), "Not yet: the first order placed gets the last mug washed.");
+        assertEquals("order 0 in the mug 399999", shop.serveNext(), "Not yet: the first order placed gets the last mug washed.");
         String last = null;
-        for (int i = 1; i < 10000; i++) {
+        for (int i = 1; i < 400000; i++) {
             last = shop.serveNext();
+            if (i % 10000 == 0 && System.nanoTime() - started > 2_000_000_000L) {
+                break;
+            }
         }
-        assertEquals("order 9999 in the mug 0", last, "Not yet: the last order placed gets the first mug washed.");
+        double seconds = (System.nanoTime() - started) / 1e9;
+        assertTrue(seconds < 2, "Not yet: the rush of 400,000 orders ran past 2 seconds: it was stopped at %.1f seconds, with %d orders still waiting. When each order joins and leaves the line in one step, the whole rush takes well under one second.".formatted(seconds, shop.ordersWaiting()));
+        assertEquals("order 399999 in the mug 0", last, "Not yet: the last order placed gets the first mug washed.");
         assertEquals(0, shop.ordersWaiting(), "Not yet: every order was served.");
         assertEquals(0, shop.mugsLeft(), "Not yet: every mug was used.");
     }

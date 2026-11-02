@@ -1,24 +1,12 @@
 namespace OrderLine;
 
-// One order in a line, for building the queue as a linked list. You don't
-// have to use it: a front index into an array works too.
-public class OrderNode
-{
-    public string Order;
-    public OrderNode? Next;
-
-    public OrderNode(string order)
-    {
-        Order = order;
-    }
-}
-
-// The line of orders: first in, first out. Build it so every method is
-// O(1): a linked list with a front and a back, or an array with a front
-// index. Not a List<string> emptied with RemoveAt(0), which is O(n), and
-// not C#'s own Queue<T>.
+// The line of orders: first in, first out. This is the queue the shop runs
+// today. It works, and it's why the order screen freezes at rush hour (the
+// ticket in README.md). Make Enqueue, Dequeue and Peek fast, keeping their
+// names and what they return: the tests and CoffeeShop call them.
 public class OrderQueue
 {
+    private readonly List<string> orders = new List<string>();
 
     // How many orders are waiting.
     public int Count { get; private set; }
@@ -32,7 +20,8 @@ public class OrderQueue
      */
     public void Enqueue(string order)
     {
-        // Your code here.
+        orders.Add(order);
+        Count++;
     }
 
     /*
@@ -45,7 +34,14 @@ public class OrderQueue
      */
     public string? Dequeue()
     {
-        return null;
+        if (orders.Count == 0)
+        {
+            return null;
+        }
+        string order = orders[0];
+        orders.RemoveAt(0);
+        Count--;
+        return order;
     }
 
     /*
@@ -56,6 +52,6 @@ public class OrderQueue
      */
     public string? Peek()
     {
-        return null;
+        return orders.Count == 0 ? null : orders[0];
     }
 }

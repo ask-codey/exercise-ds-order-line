@@ -81,18 +81,24 @@ test("with no order, the mugs stay", () => {
   assert.equal(shop.serveNext(), "cold brew in the red mug", "Not yet: the new order gets the mug that was waiting.");
 });
 
-test("rush hour", () => {
+test("the rush hour stays fast", () => {
   const shop = new CoffeeShop();
-  for (let i = 0; i < 10000; i++) {
+  const started = performance.now();
+  for (let i = 0; i < 400000; i++) {
     shop.washMug(`mug ${i}`);
     shop.placeOrder(`order ${i}`);
   }
-  assert.equal(shop.serveNext(), "order 0 in the mug 9999", "Not yet: the first order placed gets the last mug washed.");
+  assert.equal(shop.serveNext(), "order 0 in the mug 399999", "Not yet: the first order placed gets the last mug washed.");
   let last = null;
-  for (let i = 1; i < 10000; i++) {
+  for (let i = 1; i < 400000; i++) {
     last = shop.serveNext();
+    if (i % 10000 === 0 && performance.now() - started > 2000) {
+      break;
+    }
   }
-  assert.equal(last, "order 9999 in the mug 0", "Not yet: the last order placed gets the first mug washed.");
+  const seconds = (performance.now() - started) / 1000;
+  assert.ok(seconds < 2, `Not yet: the rush of 400,000 orders ran past 2 seconds: it was stopped at ${seconds.toFixed(1)} seconds, with ${shop.ordersWaiting} orders still waiting. When each order joins and leaves the line in one step, the whole rush takes well under one second.`);
+  assert.equal(last, "order 399999 in the mug 0", "Not yet: the last order placed gets the first mug washed.");
   assert.equal(shop.ordersWaiting, 0, "Not yet: every order was served.");
   assert.equal(shop.mugsLeft, 0, "Not yet: every mug was used.");
 });
